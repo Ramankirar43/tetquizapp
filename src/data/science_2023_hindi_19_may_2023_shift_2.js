@@ -112,7 +112,7 @@ export const questions = [
       "A. शारीरिक जरूरतें",
       "B. ",
       "C. सहकर्मी",
-      "D. संस्कृ ति"
+      "D. संस्कृति"
     ],
     "ans": "D"
   },
@@ -125,7 +125,7 @@ export const questions = [
       "A. धूम्रपान (Smoking)",
       "B. लियोफिलाइजेशन (Lyophilization)",
       "C. निर्जलीकरण (Dehydration)",
-      "D. कै निंग (Canning)"
+      "D. कैनिंग (Canning)"
     ],
     "ans": "D"
   },

@@ -12,7 +12,9 @@ import { questions as hi13S1, TEST_DURATION as hi13S1Dur, EXAM_NAME as hi13S1Nam
 import { questions as hi13S2, TEST_DURATION as hi13S2Dur, EXAM_NAME as hi13S2Name } from './science_2023_hindi_13_may_2023_shift_2';
 import { questions as hi19S1, TEST_DURATION as hi19S1Dur, EXAM_NAME as hi19S1Name } from './science_2023_hindi_19_may_2023_shift_1';
 import { questions as hi19S2, TEST_DURATION as hi19S2Dur, EXAM_NAME as hi19S2Name } from './science_2023_hindi_19_may_2023_shift_2';
-
+import { questions as upsi, TEST_DURATION as upsiDur, EXAM_NAME as upsiName } from './up_police_si_14mar2026_shift1';
+import { questions as practiceSet01 } from './practice_set01';
+import { questions as practiceSet02 } from './practiceset02';
 function makeTest(id, name, year, questionsList, duration, examName, group) {
   return {
     id,
@@ -34,6 +36,7 @@ const englishScience2023 = [
   makeTest('science_13_may_2023_s2', '13 May 2023 — Shift 2', '2023', en13S2, en13S2Dur, en13S2Name, 'Science PYQ 2023'),
   makeTest('science_19_may_2023_s1', '19 May 2023 — Shift 1', '2023', en19S1, en19S1Dur, en19S1Name, 'Science PYQ 2023'),
   makeTest('science_19_may_2023_s2', '19 May 2023 — Shift 2', '2023', en19S2, en19S2Dur, en19S2Name, 'Science PYQ 2023'),
+  makeTest('UPSI TEST 2026', '14 Mar 2026 — Shift 1', '2026', upsi, upsiDur, upsiName, 'UPSI 2026'),
 ];
 
 const hindiScience2023 = [
@@ -43,6 +46,25 @@ const hindiScience2023 = [
   makeTest('science_hindi_13_may_2023_s2', '13 May 2023 — Shift 2', '2023', hi13S2, hi13S2Dur, hi13S2Name, 'Science PYQ 2023'),
   makeTest('science_hindi_19_may_2023_s1', '19 May 2023 — Shift 1', '2023', hi19S1, hi19S1Dur, hi19S1Name, 'Science PYQ 2023'),
   makeTest('science_hindi_19_may_2023_s2', '19 May 2023 — Shift 2', '2023', hi19S2, hi19S2Dur, hi19S2Name, 'Science PYQ 2023'),
+ makeTest(
+  'practice_set_01',
+  'Practice Set 01',
+  'Practice',
+  practiceSet01,
+  120,
+  'Practice Set 01',
+  'Practice Sets'
+),
+
+makeTest(
+  'practice_set_02',
+  'Practice Set 02',
+  'Practice',
+  practiceSet02,
+  120,
+  'Practice Set 02',
+  'Practice Sets'
+),
 ];
 
 export const examCatalog = [
