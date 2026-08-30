@@ -84,6 +84,8 @@ export default function App() {
 
   const [showModeModal, setShowModeModal] = useState(false);
 
+  const [reviseQuestionNo, setReviseQuestionNo] = useState(null);
+
   const [feedbackByQuestion, setFeedbackByQuestion] = useState({});
 
   const testStartTimeRef = useRef(testStartTime);
@@ -138,7 +140,7 @@ export default function App() {
 
 
 
-  const startTest = useCallback((testId, { fresh = false, progress = null, mode = null } = {}) => {
+  const startTest = useCallback((testId, { fresh = false, progress = null, mode = null, questionNo = null, revealCorrectAnswer = false } = {}) => {
 
     if (fresh) {
 
@@ -201,6 +203,26 @@ export default function App() {
 
 
     setSelectedTest(testId);
+
+    const nextQuestionNo = questionNo || 1;
+
+    if (nextQuestionNo) {
+      setCurrentQuestion(nextQuestionNo);
+    }
+
+    if (revealCorrectAnswer) {
+      const questionData = testConfigs[testId]?.questions?.find((q) => q.no === nextQuestionNo);
+      if (questionData) {
+        setFeedbackByQuestion({
+          [nextQuestionNo]: {
+            selectedAnswer: null,
+            correctAnswer: questionData.ans || null,
+            isCorrect: false,
+            isRevise: true,
+          },
+        });
+      }
+    }
 
   }, [resetExamState]);
 
@@ -616,7 +638,25 @@ export default function App() {
 
 
 
-  const handleTestSelection = (testId) => {
+  const handleTestSelection = (testId, options = {}) => {
+
+    if (options.reviseQuestionNo) {
+      const hydrateRevise = (mode) => {
+        const questionNo = options.reviseQuestionNo;
+        const targetTest = testConfigs[testId];
+        if (!targetTest) return;
+
+        startTest(testId, {
+          fresh: true,
+          mode,
+          questionNo,
+          revealCorrectAnswer: true,
+        });
+      };
+
+      hydrateRevise('practice');
+      return;
+    }
 
     setPendingTestId(testId);
 

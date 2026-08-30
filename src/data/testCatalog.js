@@ -64,34 +64,12 @@ const hindiScience2023 = [
   makeTest('science_hindi_13_may_2023_s2', '13 May 2023 — Shift 2', '2023', hi13S2, hi13S2Dur, hi13S2Name, 'Science PYQ 2023'),
   makeTest('science_hindi_19_may_2023_s1', '19 May 2023 — Shift 1', '2023', hi19S1, hi19S1Dur, hi19S1Name, 'Science PYQ 2023'),
   makeTest('science_hindi_19_may_2023_s2', '19 May 2023 — Shift 2', '2023', hi19S2, hi19S2Dur, hi19S2Name, 'Science PYQ 2023'),
- makeTest(
-  'practice_set_01',
-  'Practice Set 01',
-  'Practice',
-  practiceSet01,
-  120,
-  'Practice Set 01',
-  'Practice Sets'
-),
+];
 
-makeTest(
-  'practice_set_02',
-  'Practice Set 02',
-  'Practice',
-  practiceSet02,
-  120,
-  'Practice Set 02',
-  'Practice Sets'
-),
-makeTest(
-  'practice_set_03',
-  'Practice Set 03',
-  'Practice',
-  practiceSet03,
-  120,
-  'Practice Set 03',
-  'Practice Sets'
-),
+const practiceSets = [
+  makeTest('practice_set_01', 'Practice Set 01', 'Practice', practiceSet01, 120, 'Practice Set 01', 'Practice Sets'),
+  makeTest('practice_set_02', 'Practice Set 02', 'Practice', practiceSet02, 120, 'Practice Set 02', 'Practice Sets'),
+  makeTest('practice_set_03', 'Practice Set 03', 'Practice', practiceSet03, 120, 'Practice Set 03', 'Practice Sets'),
 ];
 
 const chapterWiseTests = [
@@ -137,6 +115,19 @@ export const examCatalog = [
         name: 'Hindi',
         nativeLabel: 'हिंदी',
         tests: hindiScience2023,
+      },
+    ],
+  },
+  {
+    id: 'practice-sets',
+    name: 'Practice Sets',
+    description: 'Standalone practice sets outside the MPTET exam section',
+    languages: [
+      {
+        id: 'practice',
+        name: 'Practice Sets',
+        nativeLabel: 'Practice Sets',
+        tests: practiceSets,
       },
     ],
   },

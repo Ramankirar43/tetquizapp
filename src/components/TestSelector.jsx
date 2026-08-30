@@ -1,5 +1,11 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { getAllSavedProgress } from '../utils/examProgress';
+import { getAllTestsFlat } from '../data/testCatalog';
+import {
+  getAllSavedProgress,
+  loadTestProgress,
+  saveTestProgress,
+  clearTestProgress,
+} from '../utils/examProgress';
 
 const TESTS_PER_PAGE = 6;
 
@@ -32,13 +38,46 @@ function ProgressBadge({ progress }) {
   );
 }
 
-export default function TestSelector({ examCatalog, onSelectTest, onResumeTest }) {
+export default function TestSelector({ examCatalog, onSelectTest, onResumeTest, onReviseQuestion }) {
   const [selectedExamId, setSelectedExamId] = useState(null);
   const [selectedLanguageId, setSelectedLanguageId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pendingTest, setPendingTest] = useState(null);
+  const [showRevisePage, setShowRevisePage] = useState(false);
+  const [reviseRefreshKey, setReviseRefreshKey] = useState(0);
 
-  const savedProgress = useMemo(() => getAllSavedProgress(), []);
+  const savedProgress = useMemo(() => getAllSavedProgress(), [reviseRefreshKey]);
+  const allTests = useMemo(() => getAllTestsFlat(), []);
+
+  const reviseQuestions = useMemo(() => {
+    const items = [];
+
+    Object.entries(savedProgress).forEach(([testId, progress]) => {
+      if (!Array.isArray(progress.reviewQuestions) || progress.reviewQuestions.length === 0) return;
+
+      const test = allTests.find((entry) => entry.id === testId);
+      if (!test) return;
+
+      progress.reviewQuestions.forEach((questionNo) => {
+        const question = test.questions.find((q) => q.no === questionNo);
+        if (!question || !question.q) return;
+
+        const correctOption = question.opts.find((option) => option.startsWith(question.ans));
+
+        items.push({
+          id: `${testId}-${questionNo}`,
+          testId,
+          questionNo,
+          questionText: question.q,
+          options: question.opts || [],
+          correctAnswer: correctOption || question.ans,
+          correctAnswerLabel: question.ans,
+        });
+      });
+    });
+
+    return items;
+  }, [allTests, savedProgress]);
 
   useEffect(() => {
     document.body.classList.add('portal-open');
@@ -103,6 +142,86 @@ export default function TestSelector({ examCatalog, onSelectTest, onResumeTest }
     setPendingTest(null);
   };
 
+  const handleRemoveReviseQuestion = (testId, questionNo) => {
+    const progress = loadTestProgress(testId) || { reviewQuestions: [] };
+    const nextReviewQuestions = (progress.reviewQuestions || []).filter((number) => number !== questionNo);
+
+    if (nextReviewQuestions.length === 0) {
+      clearTestProgress(testId);
+    } else {
+      saveTestProgress(testId, { ...progress, reviewQuestions: nextReviewQuestions });
+    }
+
+    setReviseRefreshKey((prev) => prev + 1);
+  };
+
+  if (showRevisePage) {
+    return (
+      <div className="test-selector-page">
+        <div className="test-selector-shell">
+          <header className="selector-header">
+            <h1 className="selector-title">Revise</h1>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setShowRevisePage(false)}
+            >
+              ← Back to Exams
+            </button>
+          </header>
+
+          <section className="selector-section">
+            <div className="revise-list">
+              {reviseQuestions.length === 0 ? (
+                <div className="revise-item">
+                  <p>No questions saved for revise.</p>
+                </div>
+              ) : (
+                reviseQuestions.map((item) => (
+                  <div
+                    key={item.id}
+                    className="revise-item revise-review-item"
+                    style={{ marginBottom: '1.25rem', padding: '1rem 1rem 0.75rem' }}
+                  >
+                    <div className="revise-header-row" style={{ justifyContent: 'flex-end', marginBottom: '0.75rem' }}>
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        style={{ padding: '0.35rem 0.7rem', fontSize: '0.78rem', minWidth: 'auto' }}
+                        onClick={() => handleRemoveReviseQuestion(item.testId, item.questionNo)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+
+                    <p>{item.questionText}</p>
+
+                    <div className="review-options">
+                      {item.options.map((option, index) => {
+                        const optionValue = option[0];
+                        const isCorrect = item.correctAnswerLabel === optionValue;
+                        const className = `review-option ${isCorrect ? 'correct-answer' : ''}`;
+
+                        return (
+                          <div key={`${item.id}-${index}`} className={className}>
+                            <span className="option-label">{option}</span>
+                            {isCorrect && <span className="correct-indicator">✓ Correct</span>}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <p className="revise-answer"><strong>Correct answer:</strong> {item.correctAnswer}</p>
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="test-selector-page">
       <div className="test-selector-shell">
@@ -116,38 +235,58 @@ export default function TestSelector({ examCatalog, onSelectTest, onResumeTest }
         )}
 
         {!selectedExamId && (
-          <section className="selector-section">
-            <h2 className="section-heading">Choose Exam</h2>
-            <div className="card-grid card-grid--exams">
-              {examCatalog.map((exam) => {
-                const testCount = exam.languages.reduce((sum, lang) => sum + lang.tests.length, 0);
-                const inProgress = exam.languages.some((lang) =>
-                  lang.tests.some((test) => savedProgress[test.id])
-                );
-                return (
+          <>
+            {reviseQuestions.length > 0 && (
+              <section className="selector-section">
+                <div className="section-row">
                   <button
-                    key={exam.id}
                     type="button"
                     className="selector-card selector-card--exam"
-                    onClick={() => {
-                      setSelectedExamId(exam.id);
-                      setCurrentPage(1);
-                    }}
+                    onClick={() => setShowRevisePage(true)}
+                    style={{ width: '100%', textAlign: 'left', cursor: 'pointer' }}
                   >
                     <div className="selector-card-top">
-                      <h3>{exam.name}</h3>
-                      {inProgress && <span className="status-pill status-pill--active">In progress</span>}
-                    </div>
-                    <p className="selector-card-desc">{exam.description}</p>
-                    <div className="selector-card-meta">
-                      <span>{exam.languages.length} languages</span>
-                      <span>{testCount} tests</span>
+                      <h2 className="section-heading" style={{ margin: 0 }}>Revise</h2>
+                      <span className="status-pill status-pill--active">{reviseQuestions.length} questions</span>
                     </div>
                   </button>
-                );
-              })}
-            </div>
-          </section>
+                </div>
+              </section>
+            )}
+
+            <section className="selector-section">
+              <h2 className="section-heading">Choose Exam</h2>
+              <div className="card-grid card-grid--exams">
+                {examCatalog.map((exam) => {
+                  const testCount = exam.languages.reduce((sum, lang) => sum + lang.tests.length, 0);
+                  const inProgress = exam.languages.some((lang) =>
+                    lang.tests.some((test) => savedProgress[test.id])
+                  );
+                  return (
+                    <button
+                      key={exam.id}
+                      type="button"
+                      className="selector-card selector-card--exam"
+                      onClick={() => {
+                        setSelectedExamId(exam.id);
+                        setCurrentPage(1);
+                      }}
+                    >
+                      <div className="selector-card-top">
+                        <h3>{exam.name}</h3>
+                        {inProgress && <span className="status-pill status-pill--active">In progress</span>}
+                      </div>
+                      <p className="selector-card-desc">{exam.description}</p>
+                      <div className="selector-card-meta">
+                        <span>{exam.languages.length} languages</span>
+                        <span>{testCount} tests</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          </>
         )}
 
         {selectedExam && !selectedLanguageId && (
