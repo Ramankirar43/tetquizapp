@@ -15,6 +15,24 @@ import { questions as hi19S2, TEST_DURATION as hi19S2Dur, EXAM_NAME as hi19S2Nam
 import { questions as upsi, TEST_DURATION as upsiDur, EXAM_NAME as upsiName } from './up_police_si_14mar2026_shift1';
 import { questions as practiceSet01 } from './practice_set01';
 import { questions as practiceSet02 } from './practiceset02';
+import { questions as practiceSet03 } from './practice_set3';
+import { questions as chapterUniverse } from './chapterwise_test/Universe';
+import { questions as chapterEnvironment } from './chapterwise_test/environment';
+import { questions as chapterFoodHealth } from './chapterwise_test/food and health.js';
+import { questions as chapterFoodManagement } from './chapterwise_test/food_management';
+import { questions as chapterForcePressureSpeed } from './chapterwise_test/force_pressure_speed';
+import { questions as chapterLivingThings } from './chapterwise_test/livingthings';
+import { questions as chapterMagnet } from './chapterwise_test/magnet';
+import { questions as chapterMatter } from './chapterwise_test/matter';
+import { questions as chapterMeasurement } from './chapterwise_test/measurement';
+import { questions as chapterNaturalResources } from './chapterwise_test/natural_resources';
+import { questions as chapterPedagogy } from './chapterwise_test/pedagogy';
+import { questions as chapterSoundLight } from './chapterwise_test/sound_light';
+import { questions as chapterTemperature } from './chapterwise_test/temperature';
+import { questions as chapterWorkEnergy } from './chapterwise_test/work_energy';
+import { questions as chapterMirrorLens } from './chapterwise_test/mirror';
+const fallbackChapterQuestions = chapterUniverse;
+
 function makeTest(id, name, year, questionsList, duration, examName, group) {
   return {
     id,
@@ -65,7 +83,38 @@ makeTest(
   'Practice Set 02',
   'Practice Sets'
 ),
+makeTest(
+  'practice_set_03',
+  'Practice Set 03',
+  'Practice',
+  practiceSet03,
+  120,
+  'Practice Set 03',
+  'Practice Sets'
+),
 ];
+
+const chapterWiseTests = [
+  { id: 'chapter_universe', name: 'ब्रह्मांड', questions: chapterUniverse },
+  { id: 'chapter_environment', name: 'पर्यावरण', questions: chapterEnvironment },
+  { id: 'chapter_food_health', name: 'खाद्य एवं स्वास्थ्य', questions: chapterFoodHealth },
+  { id: 'chapter_food_management', name: 'खाद्य प्रबंधन', questions: chapterFoodManagement },
+  { id: 'chapter_force_pressure_speed', name: 'बल, दाब एवं गति', questions: chapterForcePressureSpeed },
+  { id: 'chapter_living_things', name: 'जीव', questions: chapterLivingThings },
+  { id: 'chapter_magnet', name: 'चुंबक', questions: chapterMagnet },
+  { id: 'chapter_matter', name: 'पदार्थ', questions: chapterMatter },
+  { id: 'chapter_measurement', name: 'मापन', questions: chapterMeasurement },
+  { id: 'chapter_natural_resources', name: 'प्राकृतिक संसाधन', questions: chapterNaturalResources },
+  { id: 'chapter_pedagogy', name: 'शिक्षाशास्त्र', questions: chapterPedagogy },
+  { id: 'chapter_sound_light', name: 'ध्वनि एवं प्रकाश', questions: chapterSoundLight },
+  { id: 'chapter_temperature', name: 'तापमान', questions: chapterTemperature },
+  { id: 'chapter_work_energy', name: 'कार्य एवं ऊर्जा', questions: chapterWorkEnergy },
+  { id: 'chapter_mirror_lens', name: 'दर्पण एवं लेंस', questions: chapterMirrorLens },
+].map((chapter) => {
+  const questionsList = Array.isArray(chapter.questions) && chapter.questions.length > 0 ? chapter.questions : fallbackChapterQuestions;
+  const duration = Math.max(15, Math.ceil(questionsList.length * 1.5));
+  return makeTest(chapter.id, chapter.name, 'अध्याय', questionsList, duration, chapter.name, 'Chapter Wise Tests');
+});
 
 export const examCatalog = [
   {
@@ -88,6 +137,19 @@ export const examCatalog = [
         name: 'Hindi',
         nativeLabel: 'हिंदी',
         tests: hindiScience2023,
+      },
+    ],
+  },
+  {
+    id: 'chapterwise',
+    name: 'Chapter Wise Tests',
+    description: 'प्रत्येक अध्याय का अलग टेस्ट — Hindi chapter-wise practice sets',
+    languages: [
+      {
+        id: 'hi',
+        name: 'Hindi',
+        nativeLabel: 'हिंदी',
+        tests: chapterWiseTests,
       },
     ],
   },
