@@ -226,7 +226,7 @@ export default function TestSelector({ examCatalog, onSelectTest, onResumeTest, 
     <div className="test-selector-page">
       <div className="test-selector-shell">
         <header className="selector-header">
-          <h1 className="selector-title">Exam Portal</h1>
+          <h1 className="selector-title">MPTET Exam Portal</h1>
           <p className="selector-subtitle">Select an exam, choose your language, and start practicing</p>
         </header>
 
